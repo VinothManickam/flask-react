@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -15,11 +14,18 @@ function App() {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('/login', {
-        username: 'your_username',
-        password: 'your_password',
+      const response = await fetch('https://welcome-yehr.onrender.com/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: 'your_username',
+          password: 'your_password',
+        }),
       });
-      const { token } = response.data;
+
+      const { token } = await response.json();
       setToken(token);
       localStorage.setItem('token', token);
       setLoggedIn(true);
@@ -36,12 +42,14 @@ function App() {
 
   const handleAuthorizedRequest = async () => {
     try {
-      const response = await axios.get('/auth', {
+      const response = await fetch('https://welcome-yehr.onrender.com/auth', {
         headers: {
           Authorization: token,
         },
       });
-      console.log(response.data);
+
+      const data = await response.json();
+      console.log(data);
     } catch (error) {
       console.error(error);
     }
@@ -53,7 +61,9 @@ function App() {
       {loggedIn ? (
         <div>
           <p>You are logged in.</p>
-          <button onClick={handleAuthorizedRequest}>Make Authorized Request</button>
+          <button onClick={handleAuthorizedRequest}>
+            Make Authorized Request
+          </button>
           <button onClick={handleLogout}>Logout</button>
         </div>
       ) : (
